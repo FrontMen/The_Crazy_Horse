@@ -25,6 +25,7 @@ body {
     width: 100%;
     height: 100%;
     position: absolute;
+    transition: top 0.3s ease-in-out;
 }
 
 .player .info {

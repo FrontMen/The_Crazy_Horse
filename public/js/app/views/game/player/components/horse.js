@@ -56,7 +56,8 @@ define(function (require) {
         createIdleTimeline: function () {
             this.timeline = new TimelineMax({
                 yoyo: true,
-                repeat: -1
+                repeat: -1,
+                delay: Math.random()
             });
 
             this.timeline.append(TweenMax.to(this.el, 0.5, {
