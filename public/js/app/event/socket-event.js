@@ -10,6 +10,9 @@ define(function () {
         PLAYER_UPDATE: 'player_update',
         WINNER: 'winner',
         DISCONNECT: 'disconnect',
-        START_GAME: 'start_game'
+        JOIN: 'join',
+        WALK: 'walk',
+        START_GAME: 'start_game',
+        END_GAME: 'end'
     };
 });
