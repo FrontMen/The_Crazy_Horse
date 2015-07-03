@@ -1,0 +1,5 @@
+node_modules
+target
+dist
+.idea
+public/js/bower_components
