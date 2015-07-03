@@ -36,7 +36,7 @@ define(function (require) {
             }
 
             this.view = view;
-            contianer.append(this.view.render().$el);
+            container.append(this.view.render().$el);
 
         }
 
