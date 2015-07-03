@@ -23,7 +23,7 @@
     <script>
       var socket = io();
 
-      socket.emit("join", "Dave");
+      socket.emit("join", {name: "Dave", id: 987654321});
 
       $('form').submit(function(){
         socket.emit('input', $('#m').val());
@@ -42,6 +42,14 @@
 
       socket.on('countdown', function(msg){
         console.log('countdown', msg);
+      });
+
+      socket.on('increment', function(msg){
+        console.log('increment', msg);
+      });
+
+      socket.on('winner', function(msg){
+        console.log('winner', msg);
       });
     </script>
   </body>

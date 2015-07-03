@@ -2,7 +2,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var people = Dictionary();
-var socket;
+var socket, started, finished;
 
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
@@ -14,7 +14,10 @@ io.on('connection', function (_socket) {
   socket.on("input", function (input) {
     switch (input) {
       case 'ready':
-        ready('data');
+        ready();
+        break;
+      case 'r':
+        increment();
         break;
     }
   });
@@ -46,22 +49,28 @@ http.listen(3000, function () {
 /***********************/
 
 function join(data) {
-  people[socket.id] = {
-    name: data,
-    ready: false
-  };
-  socket.emit("join", people[socket.id].name + " has connected to the server.");
+  if(!started) {
+    people[socket.id] = {
+      name: data.name,
+      id: data.id,
+      ready: false,
+      progression: 0
+    };
+    socket.emit("join", people[socket.id].name + " has connected to the server.");
+  }
 }
 
-function ready(data) {
-  people[socket.id].ready = true;
-  socket.emit("ready", people);
+function ready() {
+  var user = people[socket.id];
+  user.ready = true;
+  socket.emit("ready", user.name);
   if (checkAllReady(people)) {
     countdown();
   }
 }
 
 function countdown() {
+  started = true;
   var iterations = 0, max = 3;
   var interval = setInterval(function () {
     iterations++;
@@ -73,9 +82,27 @@ function countdown() {
   io.emit('countdown', max);
 }
 
+function increment() {
+  if(!finished) {
+    var user = people[socket.id];
+    user.progression++;
+    io.emit('increment', people);
+    if (user.progression === 3) {
+      winner(user);
+    }
+  }
+}
+
+function winner(winner) {
+  finished = true;
+  io.emit('winner', winner.name);
+}
+
 function end(data) {
 
 }
+
+/* helpers */
 
 function checkAllReady(dict) {
   var key, user;
