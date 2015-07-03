@@ -1,4 +1,3 @@
-
 requirejs.config({
 
     baseUrl: 'js/',
