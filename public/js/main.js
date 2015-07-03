@@ -9,6 +9,9 @@ requirejs.config({
         'jquery': 'bower_components/jquery/dist/jquery.min',
         'text': 'bower_components/requirejs-text/text',
         'alertifyjs': 'bower_components/alertifyjs/dist/alertify',
+        'TweenMax': 'bower_components/greensock/src/minified/TweenMax.min',
+        'TweenLite': 'bower_components/greensock/src/minified/TweenLite.min',
+        'TimelineMax': 'bower_components/greensock/src/minified/TimelineMax.min',
         'application': 'app/views/app',
         'router': 'app/router'
     },
