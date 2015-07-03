@@ -37,9 +37,9 @@ io.on('connection', function (_socket) {
     end(data);
   });
 
-  //socket.on('disconnect', function (data) {
-  //  disconnect(data)
-  //});
+  socket.on('disconnect', function (data) {
+    disconnect(data)
+  });
 });
 
 http.listen(3000, function () {
@@ -112,13 +112,13 @@ function end() {
   finished = false;
 }
 
-//function disconnect() {
-//  var user = people[socket.id];
-//  if (user) {
-//    io.sockets.emit('disconnect', user.name);
-//  }
-//  delete user;
-//}
+function disconnect() {
+  var user = people[socket.id];
+  if (user) {
+    io.sockets.emit('disconnect', user.name);
+  }
+  delete user;
+}
 
 /* helpers */
 
