@@ -16,8 +16,8 @@ define(function (require) {
             this.trigger(SocketEvent.DISCONNECT, data);
         }.bind(this));
 
-        this.socket.on('player-connected', function () {
-            this.trigger(SocketEvent.PLAYER_CONNECTED);
+        this.socket.on('player-connected', function (data) {
+            this.trigger(SocketEvent.PLAYER_CONNECTED, data);
         }.bind(this));
 
         this.socket.on('player-ready', function (data) {
@@ -56,17 +56,17 @@ define(function (require) {
             return this.userID;
         },
 
-        ready: function () {
-            this.socket.emit(SocketEvent.READY);
-        },
-
         playerList: function () {
             return new Promise(function (resolve) {
-                this.socket.emit('getPlayerList');
-                this.socket.on('playerList', function (list) {
+                this.socket.emit('player-list');
+                this.socket.on('player-list', function (list) {
                     resolve(list);
                 });
             }.bind(this));
+        },
+
+        ready: function () {
+            this.socket.emit(SocketEvent.READY);
         },
 
         walk: function (speed) {
