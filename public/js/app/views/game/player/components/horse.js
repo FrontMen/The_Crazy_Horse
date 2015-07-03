@@ -24,6 +24,7 @@ define(function (require) {
 
         render: function () {
             this.$el.html(_.template($(this.template).html()));
+            this.setRandomColor();
 
             return this;
         },
@@ -52,19 +53,31 @@ define(function (require) {
             this.updateAnimation();
         },
 
+        setRandomColor: function () {
+            var letters = '0123456789ABCDEF'.split('');
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+
+            this.$('svg').css({
+                'fill': color
+            });
+        },
+
         updateAnimation: function () {
             if (this.timeline) {
                 this.timeline.stop();
             }
 
             switch (this.state) {
-            case this.states.IDLE:
-                this.createIdleTimeline();
-                break;
+                case this.states.IDLE:
+                    this.createIdleTimeline();
+                    break;
 
-            case this.states.RUNNING:
-                this.createRunningTimeline();
-                break;
+                case this.states.RUNNING:
+                    this.createRunningTimeline();
+                    break;
             }
         },
 
