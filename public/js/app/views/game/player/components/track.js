@@ -4,10 +4,9 @@ define(function () {
 
     return Backbone.View.extend({
 
+        className: 'track',
+
         render: function () {
-            this.$el.css({
-                background: 'url("assets/img/track.png") repeat-x'
-            });
 
             return this;
         }

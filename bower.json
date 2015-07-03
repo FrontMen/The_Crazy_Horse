@@ -8,7 +8,8 @@
     "requirejs": "~2.1.18",
     "jquery": "~2.1.4",
     "requirejs-text": "~2.0.14",
-    "alertifyjs": "~0.3.18"
+    "alertifyjs": "~0.3.18",
+    "greensock": "~1.17.0"
   },
   "repository": {
     "type": "git",
