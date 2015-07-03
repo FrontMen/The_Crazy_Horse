@@ -1,5 +1,5 @@
 node_modules
-bower_components
 target
 dist
 .idea
+public/js/bower_components

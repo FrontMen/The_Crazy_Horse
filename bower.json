@@ -1,0 +1,19 @@
+{
+  "name": "The_Crazy_Horse",
+  "version": "1.0.0",
+  "description": "Racing game",
+  "main": "index.js",
+  "dependencies": {
+    "backbone": "^1.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FrontMen/The_Crazy_Horse.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FrontMen/The_Crazy_Horse/issues"
+  },
+  "homepage": "https://github.com/FrontMen/The_Crazy_Horse"
+}
