@@ -16,8 +16,11 @@ io.on('connection', function (_socket) {
       case 'ready':
         ready();
         break;
+      case 'c':
+        connection();
+        break;
       case 'r':
-        increment();
+        walk();
         break;
     }
   });
@@ -30,40 +33,46 @@ io.on('connection', function (_socket) {
     ready(data);
   });
 
-  socket.on("ready", function (data) {
-    ready(data);
-  });
-
   socket.on('end', function (data) {
     end(data);
   });
+
+  //socket.on('disconnect', function (data) {
+  //  disconnect(data)
+  //});
 });
 
 http.listen(3000, function () {
   console.log('listening on *:3000');
 });
 
-
 /***********************/
 /******* Methods *******/
 /***********************/
 
 function join(data) {
-  if(!started) {
-    people[socket.id] = {
+  var user;
+  if (!started) {
+    user = {
       name: data.name,
-      id: data.id,
+      id: socket.id,
       ready: false,
       progression: 0
     };
-    socket.emit("join", people[socket.id].name + " has connected to the server.");
+    people[socket.id] = user;
+    socket.emit("user-joined", user);
+    io.sockets.emit("player-connected", user.name);
   }
+}
+
+function connection() {
+  socket.emit('player-connection', people[socket.id]);
 }
 
 function ready() {
   var user = people[socket.id];
   user.ready = true;
-  socket.emit("ready", user.name);
+  io.sockets.emit("player-ready", user);
   if (checkAllReady(people)) {
     countdown();
   }
@@ -71,22 +80,21 @@ function ready() {
 
 function countdown() {
   started = true;
-  var iterations = 0, max = 3;
-  var interval = setInterval(function () {
+  var iterations = 0, max = 3, interval = setInterval(function () {
     iterations++;
-    io.emit('countdown', (max - iterations));
+    io.sockets.emit('countdown', (max - iterations));
     if (iterations === max) {
       clearInterval(interval);
     }
   }, 1000);
-  io.emit('countdown', max);
+  io.sockets.emit('countdown', max);
 }
 
-function increment() {
-  if(!finished) {
+function walk() {
+  if (!finished) {
     var user = people[socket.id];
     user.progression++;
-    io.emit('increment', people);
+    io.sockets.emit('player-update', people.toArray);
     if (user.progression === 3) {
       winner(user);
     }
@@ -95,12 +103,22 @@ function increment() {
 
 function winner(winner) {
   finished = true;
-  io.emit('winner', winner.name);
+  io.sockets.emit('winner', winner);
 }
 
-function end(data) {
-
+function end() {
+  people = null;
+  started = false;
+  finished = false;
 }
+
+//function disconnect() {
+//  var user = people[socket.id];
+//  if (user) {
+//    io.sockets.emit('disconnect', user.name);
+//  }
+//  delete user;
+//}
 
 /* helpers */
 
@@ -115,6 +133,8 @@ function checkAllReady(dict) {
   }
   return true;
 }
+
+/* dict */
 
 function Dictionary() {
   return Object.create({}, {
