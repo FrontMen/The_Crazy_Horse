@@ -12,13 +12,25 @@ define(function (require) {
             this.trigger(SocketEvent.CONNECTED);
         }.bind(this));
 
+        this.socket.on('disconnect', function (data) {
+            this.trigger(SocketEvent.DISCONNECT, data);
+        }.bind(this));
+
         this.socket.on('player-connected', function () {
             this.trigger(SocketEvent.PLAYER_CONNECTED);
         }.bind(this));
 
-        this.socket.on('player-ready', function () {
-            this.trigger(SocketEvent.PLAYER_READY);
+        this.socket.on('player-ready', function (data) {
+            this.trigger(SocketEvent.PLAYER_READY, data);
         }.bind(this));
+
+        this.socket.on('player-update', function (data) {
+            this.trigger(SocketEvent.PLAYER_UPDATE, data);
+        }.bind(this));
+
+        this.socket.on('winner', function (data) {
+            this.trigger(SocketEvent.END_GAME, data);
+        });
 
         this.socket.on('countdown', function (data) {
             if (data) {
@@ -40,16 +52,12 @@ define(function (require) {
             }.bind(this));
         },
 
-        getUserById: function (id) {
-
-        },
-
         getOwnPlayerId: function () {
             return this.userID;
         },
 
         ready: function () {
-            this.socket.emit('ready');
+            this.socket.emit(SocketEvent.READY);
         },
 
         playerList: function () {
@@ -63,10 +71,6 @@ define(function (require) {
 
         walk: function (speed) {
             this.socket.emit(SocketEvent.WALK, speed);
-        },
-
-        gameover: function () {
-            this.socket.emit(SocketEvent.END_GAME);
         }
 
     }, Backbone.Events);
