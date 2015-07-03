@@ -44,7 +44,7 @@ define(function (require) {
 
         },
 
-        getOwnPlayer: function () {
+        getOwnPlayerId: function () {
             return this.userID;
         },
 
