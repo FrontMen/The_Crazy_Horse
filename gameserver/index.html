@@ -22,14 +22,26 @@
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var socket = io();
+
       socket.emit("join", "Dave");
+
       $('form').submit(function(){
-        socket.emit('ready', $('#m').val());
+        socket.emit('input', $('#m').val());
         $('#m').val('');
         return false;
       });
+
       socket.on('join', function(msg){
+	      console.log('join', msg);
         $('#messages').append($('<li>').text(msg));
+      });
+
+      socket.on('ready', function(msg){
+        console.log('ready', msg);
+      });
+
+      socket.on('countdown', function(msg){
+        console.log('countdown', msg);
       });
     </script>
   </body>
