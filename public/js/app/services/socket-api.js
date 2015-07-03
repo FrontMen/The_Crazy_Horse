@@ -59,7 +59,7 @@ define(function (require) {
         playerList: function () {
             return new Promise(function (resolve) {
                 this.socket.emit('player-list');
-                this.socket.on('player-list', function (list) {
+                this.socket.on('player-listing', function (list) {
                     resolve(list);
                 });
             }.bind(this));
