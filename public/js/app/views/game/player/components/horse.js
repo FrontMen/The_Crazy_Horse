@@ -18,6 +18,7 @@ define(function (require) {
         },
 
         timeline: null,
+        previousProgression: 0,
 
         speed: 20,
 
@@ -25,6 +26,20 @@ define(function (require) {
             this.$el.html(_.template($(this.template).html()));
 
             return this;
+        },
+
+        update: function (progression) {
+            if (progression > this.previousProgression) {
+                this.setRunning();
+            } else {
+                this.setIdle();
+            }
+
+            this.$el.css({
+                left: progression + '%'
+            });
+
+            this.previousProgression = progression;
         },
 
         setIdle: function () {

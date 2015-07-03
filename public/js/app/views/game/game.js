@@ -2,7 +2,10 @@ define(function (require) {
 
     'use strict';
 
-    var Player = require('app/views/game/player/player')
+    var Player = require('app/views/game/player/player'),
+        Countdown = require('app/views/game/countdown/countdown'),
+        socketApi = require('app/services/socket-api'),
+        SocketEvent = require('app/event/socket-event');
 
     return Backbone.View.extend({
 
@@ -11,19 +14,23 @@ define(function (require) {
         players: [],
 
         initialize: function () {
-            this.createPlayer({
-                name: 'test'
+            this.createPlayers();
+
+            socketApi.on(SocketEvent.START_GAME, this.startGame, this);
+            socketApi.on(SocketEvent.END_GAME, this.endGame, this);
+            socketApi.on(SocketEvent.COUNTDOWN, this.countdown, this);
+        },
+
+        createPlayers: function () {
+            socketApi.playerList().then(function (players) {
+                if (players) {
+                    players.forEach(function (player) {
+                        this.createPlayer(player);
+                    });
+                }
             });
 
-            this.createPlayer({
-                name: 'test2'
-            });
-
-            this.createPlayer({
-                name: 'test3'
-            });
-
-            this.startGame();
+            socketApi.on(SocketEvent.PLAYER_CONNECTED, this.createPlayer, this);
         },
 
         createPlayer: function (options) {
@@ -49,11 +56,16 @@ define(function (require) {
             });
         },
 
+        countdown: function (count) {
+            var countdown = new Countdown(count)
+            this.$el.append(countdown.render().$el);
+        },
+
         startGame: function () {
             $(window).on('keyup', this.onKeyUp.bind(this));
         },
 
-        stopGame: function () {
+        endGame: function () {
             $(window).off('keyup', this.onKeyUp.bind(this));
         },
 
@@ -68,6 +80,10 @@ define(function (require) {
 
         remove: function () {
             Backbone.View.prototype.remove.apply(this, arguments);
+
+            socketApi.off(SocketEvent.START_GAME, this.startGame, this);
+            socketApi.off(SocketEvent.END_GAME, this.endGame, this);
+
             _.invoke(this.players, 'remove');
         }
 
