@@ -2,7 +2,8 @@ define(function (require) {
 
     'use strict';
 
-    var socketApi = require('app/services/socket-api');
+    var socketApi = require('app/services/socket-api'),
+        SocketEvent = require('app/event/socket-event');
 
     return Backbone.View.extend({
 
@@ -24,8 +25,14 @@ define(function (require) {
             event.preventDefault();
 
             var name = this.$('.username').val();
+            socketApi.on(SocketEvent.PLAYER_CONNECTED, function () {
+                Backbone.history.navigate('game', {
+                    trigger: true
+                });
+            });
             socketApi.join(name);
 
+            //Todo: TEMP!!
             Backbone.history.navigate('game', {
                 trigger: true
             });
