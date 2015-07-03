@@ -33,7 +33,7 @@ define(function (require) {
         });
 
         this.socket.on('countdown', function (data) {
-            if (data) {
+            if (data === 0) {
                 this.trigger(SocketEvent.START_GAME);
             } else {
                 this.trigger(SocketEvent.COUNTDOWN, data);
