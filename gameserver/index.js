@@ -16,6 +16,9 @@ io.on('connection', function (_socket) {
       case 'ready':
         ready();
         break;
+      case 'list':
+        playerList();
+        break;
       case 'c':
         connection();
         break;
@@ -35,6 +38,10 @@ io.on('connection', function (_socket) {
 
   socket.on('end', function (data) {
     end(data);
+  });
+
+  socket.on('player-list', function (data) {
+    playerList(data);
   });
 
   socket.on('disconnect', function (data) {
@@ -63,6 +70,14 @@ function join(data) {
     socket.emit("user-joined", user);
     io.sockets.emit("player-connected", user.name);
   }
+}
+
+function playerList() {
+  var array = [];
+  people.toArray.forEach(function(key) {
+    array.push(people[key]);
+  });
+  socket.emit('player-list', array);
 }
 
 function connection() {
@@ -115,7 +130,7 @@ function end() {
 function disconnect() {
   var user = people[socket.id];
   if (user) {
-    io.sockets.emit('disconnect', user.name);
+    io.sockets.emit('disconnected', user.name);
   }
   delete user;
 }

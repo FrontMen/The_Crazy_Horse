@@ -81,6 +81,10 @@
 		console.log('user-joined', msg);
 	});
 
+	socket.on('player-list', function (msg) {
+		console.log('player-list', msg);
+	});
+
 	socket.on('player-connected', function (msg) {
 		console.log('player-connected', msg);
 	});
