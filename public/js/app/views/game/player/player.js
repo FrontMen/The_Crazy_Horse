@@ -14,8 +14,11 @@ define(function (require) {
 
         className: 'player',
 
+        id: null,
+
         initialize: function (options) {
             this.options = options;
+            this.id = options.id;
             socketApi.on(SocketEvent.START_GAME, this.startListeningForUpdates, this);
             socketApi.on(SocketEvent.END_GAME, this.stopListeningForUpdates, this);
         },
@@ -54,6 +57,14 @@ define(function (require) {
 
         stopListeningForUpdates: function () {
             socketApi.off(SocketEvent.PLAYER_UPDATE, this.updatePlayer, this);
+        },
+
+        setWinner: function () {
+            this.horse.setWinner();
+        },
+
+        setLoser: function () {
+            this.horse.setLoser();
         },
 
         updatePlayer: function (players) {
