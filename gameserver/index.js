@@ -1,15 +1,22 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var _ = require('lodash');
 var people = Dictionary();
-var socket, started, finished;
+var started, finished;
+var throttleWalk;
 
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
 });
 
-io.on('connection', function (_socket) {
-  socket = _socket;
+io.on('connection', function (socket) {
+
+  throttleWalk = _.throttle(throttleMe, 200);
+
+  function throttleMe() {
+    io.sockets.emit('player-update', getList());
+  }
 
   socket.on("input", function (input) {
     switch (input) {
@@ -17,35 +24,42 @@ io.on('connection', function (_socket) {
         ready();
         break;
       case 'list':
-        playerList();
+        playerList(socket);
         break;
       case 'c':
-        connection();
+        connection(socket);
         break;
       case 'r':
-        walk();
+        walk(socket);
         break;
     }
   });
 
   socket.on("join", function (data) {
-    join(data);
+    if(getList().length < 5) {
+      join(socket, data);
+    }
   });
 
-  socket.on("ready", function (data) {
-    ready(data);
+  socket.on("ready", function () {
+    ready(socket);
   });
 
-  socket.on('end', function (data) {
-    end(data);
+  socket.on('end', function () {
+    end(socket);
   });
 
-  socket.on('player-list', function (data) {
-    playerList(data);
+
+  socket.on('walk', function () {
+    walk(socket);
   });
 
-  socket.on('disconnect', function (data) {
-    disconnect(data)
+  socket.on('player-list', function () {
+    playerList(socket);
+  });
+
+  socket.on('disconnect', function () {
+    disconnect(socket)
   });
 });
 
@@ -57,7 +71,7 @@ http.listen(3000, function () {
 /******* Methods *******/
 /***********************/
 
-function join(data) {
+function join(socket, data) {
   var user;
   if (!started) {
     user = {
@@ -68,23 +82,19 @@ function join(data) {
     };
     people[socket.id] = user;
     socket.emit("user-joined", user);
-    io.sockets.emit("player-connected", user.name);
+    io.sockets.emit("player-connected", user);
   }
 }
 
-function playerList() {
-  var array = [];
-  people.toArray.forEach(function(key) {
-    array.push(people[key]);
-  });
-  socket.emit('player-list', array);
+function playerList(socket) {
+  socket.emit('player-listing', getList());
 }
 
-function connection() {
+function connection(socket) {
   socket.emit('player-connection', people[socket.id]);
 }
 
-function ready() {
+function ready(socket) {
   var user = people[socket.id];
   user.ready = true;
   io.sockets.emit("player-ready", user);
@@ -105,12 +115,12 @@ function countdown() {
   io.sockets.emit('countdown', max);
 }
 
-function walk() {
+function walk(socket) {
   if (!finished) {
     var user = people[socket.id];
     user.progression++;
-    io.sockets.emit('player-update', people.toArray);
-    if (user.progression === 3) {
+    throttleWalk();
+    if (user.progression === 100) {
       winner(user);
     }
   }
@@ -121,13 +131,13 @@ function winner(winner) {
   io.sockets.emit('winner', winner);
 }
 
-function end() {
+function end(socket) {
   people = null;
   started = false;
   finished = false;
 }
 
-function disconnect() {
+function disconnect(socket) {
   var user = people[socket.id];
   if (user) {
     io.sockets.emit('disconnected', user.name);
@@ -136,6 +146,14 @@ function disconnect() {
 }
 
 /* helpers */
+
+function getList() {
+  var array = [];
+  people.toArray.forEach(function(key) {
+    array.push(people[key]);
+  });
+  return array;
+}
 
 function checkAllReady(dict) {
   var key, user;

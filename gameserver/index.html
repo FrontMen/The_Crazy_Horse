@@ -61,7 +61,7 @@
 <script>
 	var socket = io();
 
-	socket.emit("join", {name: 'Dave'+Math.round(Math.random()*100000), id: 987654321});
+	//socket.emit("join", {name: 'Dave'+Math.round(Math.random()*100000), id: 987654321});
 
 	$('form').submit(function () {
 		socket.emit('input', $('#m').val());
@@ -81,8 +81,8 @@
 		console.log('user-joined', msg);
 	});
 
-	socket.on('player-list', function (msg) {
-		console.log('player-list', msg);
+	socket.on('player-listing', function (msg) {
+		console.log('player-listing', msg);
 	});
 
 	socket.on('player-connected', function (msg) {
