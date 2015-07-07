@@ -12,7 +12,7 @@ define(function (require) {
         },
 
         render: function () {
-            var label = (this.count === 0) ? 'START' : this.count;
+            var label = (this.count === 0) ? 'START!' : this.count;
             this.$el.html(label);
 
             TweenMax.to(this.el, 1, {

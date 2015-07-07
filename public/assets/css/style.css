@@ -65,7 +65,7 @@ body {
 .horse-container {
     position: absolute;
     left: 150px;
-    right: 0;
+    right: 150px;
     bottom: 0;
     top: 10px;
 

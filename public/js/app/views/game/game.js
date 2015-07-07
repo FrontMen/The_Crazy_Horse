@@ -18,19 +18,22 @@ define(function (require) {
 
             socketApi.on(SocketEvent.START_GAME, this.startGame, this);
             socketApi.on(SocketEvent.END_GAME, this.endGame, this);
+            socketApi.on(SocketEvent.END_GAME, this.setWinner, this);
+            socketApi.on(SocketEvent.DISCONNECT, this.removePlayer, this);
             socketApi.on(SocketEvent.COUNTDOWN, this.countdown, this);
         },
 
         createPlayers: function () {
             socketApi.playerList().then(function (players) {
+                console.log(players);
                 if (players) {
                     players.forEach(function (player) {
                         this.createPlayer(player);
-                    });
+                    }.bind(this));
                 }
-            });
 
-            socketApi.on(SocketEvent.PLAYER_CONNECTED, this.createPlayer, this);
+                socketApi.on(SocketEvent.PLAYER_CONNECTED, this.createPlayer, this);
+            }.bind(this));
         },
 
         createPlayer: function (options) {
@@ -38,6 +41,17 @@ define(function (require) {
             this.$el.append(player.render().$el);
 
             this.players.push(player);
+
+            this.positionPlayers();
+        },
+
+        removePlayer: function (data) {
+            this.players.forEach(function (player, index) {
+                if (data.id === player.id) {
+                    player.remove();
+                    this.players.splice(index, 1);
+                }
+            }.bind(this));
 
             this.positionPlayers();
         },
@@ -57,7 +71,7 @@ define(function (require) {
         },
 
         countdown: function (count) {
-            var countdown = new Countdown(count)
+            var countdown = new Countdown(count);
             this.$el.append(countdown.render().$el);
         },
 
@@ -69,11 +83,22 @@ define(function (require) {
             $(window).off('keyup', this.onKeyUp.bind(this));
         },
 
+        setWinner: function (winner) {
+            this.countdown(winner.name);
+            this.players.forEach(function (player) {
+                if (player.id === winner.id) {
+                    player.setWinner();
+                } else {
+                    player.setLoser();
+                }
+            });
+        },
+
         onKeyUp: function (event) {
             event.preventDefault();
 
             if (event.keyCode === 32 /*space*/) {
-                console.log('move!');
+                socketApi.walk(1);
             }
 
         },
@@ -83,6 +108,7 @@ define(function (require) {
 
             socketApi.off(SocketEvent.START_GAME, this.startGame, this);
             socketApi.off(SocketEvent.END_GAME, this.endGame, this);
+            socketApi.off(SocketEvent.END_GAME, this.setWinner, this);
 
             _.invoke(this.players, 'remove');
         }

@@ -39,8 +39,13 @@ define(function (require) {
         onPlayerReady: function (player) {
             if (this.options.id === player.id) {
                 socketApi.off(SocketEvent.PLAYER_READY, this.onPlayerReady, this);
+                this.options = player;
                 this.render();
             }
+        },
+
+        setReady: function () {
+            socketApi.ready();
         }
     });
 });

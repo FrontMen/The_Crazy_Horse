@@ -6,7 +6,7 @@ define(function (require) {
         ServerEvent = require('app/event/server-event');
 
     var socket = function () {
-        this.socket = io('http://localhost:3000');
+        this.socket = io('http://192.168.1.2:3000');
 
         this.socket.on('connect', function () {
             this.trigger(SocketEvent.CONNECTED);
@@ -30,10 +30,11 @@ define(function (require) {
 
         this.socket.on('winner', function (data) {
             this.trigger(SocketEvent.END_GAME, data);
-        });
+        }.bind(this));
 
         this.socket.on('countdown', function (data) {
-            if (data === 0) {
+            if (parseInt(data, 10) === 0) {
+                this.trigger(SocketEvent.COUNTDOWN, data);
                 this.trigger(SocketEvent.START_GAME);
             } else {
                 this.trigger(SocketEvent.COUNTDOWN, data);
@@ -47,8 +48,8 @@ define(function (require) {
             this.socket.emit(SocketEvent.JOIN, {
                 name: name
             });
-            this.socket.on(ServerEvent.USER_JOINED, function (id) {
-                this.userID = id
+            this.socket.on(ServerEvent.USER_JOINED, function (user) {
+                this.userID = user.id;
             }.bind(this));
         },
 
